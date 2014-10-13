@@ -1,12 +1,12 @@
 # vi: set ft=yaml :
 
 # Home directory on remote machines
-dotfiles_user_home: /home/sloria
+dotfiles_user_home: /home/jmcarp
 # Where your dotfiles live. Probably don't need to change this.
 dotfiles_home: "{{dotfiles_user_home}}/dotfiles"
 
 # Git
-git_user: sloria
+git_user: jmcarp
 # If you use github, this should be the same as the email
 #  used on Github
-git_email: sloria1@gmail.com
+git_email: jm.carp@gmail.com

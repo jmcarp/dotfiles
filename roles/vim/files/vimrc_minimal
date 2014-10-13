@@ -1,5 +1,4 @@
 set nocompatible              " be iMproved, required for Vundle
-filetype off                  " required for Vundle
 
 " Spacebar is a much better leader than \ or ,
 let mapleader = "\<Space>"
@@ -10,62 +9,53 @@ if has("autocmd")
 endif
 
 """"" PLUGINS """""
-
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" let Vundle manage Vundle, required
-Plugin 'gmarik/Vundle.vim'
-Plugin 'rking/ag.vim'
-Plugin 'kien/ctrlp.vim'
+call plug#begin()
+Plug 'rking/ag.vim'
+Plug 'kien/ctrlp.vim'
+" Go to symbol
 " Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
 if executable('ag')
 " Use Ag over Grep
   set grepprg=ag\ --nogroup\ --nocolor
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-
+  " Use ag in CtrlP for listing files.
+  let g:ctrlp_user_command = 'ag %s -i -l --nocolor --nogroup --ignore ''.git'' --ignore ''.DS_Store'' --ignore ''.ropeproject'' --ignore ''node_modules'' --hidden -g ""'
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
   nnoremap <leader>f :Ag<space>
 else
   noremap <leader>f :Ack<space>
 endif
-" Go to symbol
 map <leader>s :CtrlPBufTag<CR>
-Plugin 'ervandew/supertab'
+Plug 'ervandew/supertab'
 
-Plugin 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree'
 nnoremap <leader>d :NERDTreeToggle<CR>
 
-Plugin 'chriskempson/vim-tomorrow-theme'
+Plug 'chriskempson/vim-tomorrow-theme'
 
-Plugin 'tpope/vim-commentary'
+Plug 'tpope/vim-commentary'
 " Toggle comment with space-/
 nmap <leader>/ gcc
 vmap <leader>/ gc
-Plugin 'tpope/vim-repeat'
-Plugin 'tpope/vim-sensible'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-unimpaired'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
 
 " Load plugins
-call vundle#end()            " required
+call plug#end()            " required
 filetype plugin indent on    " required
 
 """ end plugins """
 
-""" BASE CUSTOMIZATIONS """
 
+""" BASE CUSTOMIZATIONS """
 set encoding=utf-8
 syntax enable
-
 set autoindent
 set autoread " reload files when changed on disk, i.e. via `git checkout`
-
 set backupcopy=yes
-" Make "yanks" work with system clipboard
-set clipboard=unnamed
+set clipboard=unnamed " Make "yanks" work with system clipboard
 set ignorecase " case-insensitive search
 set incsearch " search as you type
 set wildmenu " show a navigable menu for tab completion
@@ -80,15 +70,15 @@ set shiftround " use multiple of shiftwidth when indenting with '<' and '>'
 
 set nobackup
 set noswapfile  " Prevent annoying swapfile dialogs
-
+" No bells
+set noerrorbells
+set visualbell
+set t_vb=
 """ VISUAL SETTINGS """
 
-set t_Co=256 " Must be 256 for Tomorrow theme to display correctly
-" let g:solarized_termcolors=256
-set background=light  " this only applies to the solarized theme, not tomorrow
+set t_Co=256 " Must be 256 for many themes to display correctly
 " May want to have different schemes for termvim vs gvim
-" termvim looks best with Tomorrow themes
-silent! colorscheme Tomorrow-Night-Eighties
+silent! colorscheme Tomorrow-Night
 
 " Show trailing whitespace
 set list
@@ -102,9 +92,7 @@ set cursorline  " have a line indicate cursor location
 set foldmethod=manual
 set previewheight=25  " Larger preview height
 set number " Show line numbers on the sidebar.
-" Do not fold by default. But if you do, do it up to 3 levels.
-set foldmethod=indent
-set foldnestmax=3
+" Do not fold by default.
 set nofoldenable
 
 " Set minimum window size to 79x5.
@@ -132,7 +120,6 @@ if exists("+undofile")
 " undofile - This allows you to use undos after exiting and restarting
 " This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
 " :help undo-persistence
-" This is only present in 7.3+
   if isdirectory($HOME . '/.vim/undo') == 0
     :silent !mkdir -p ~/.vim/undo > /dev/null 2>&1
   endif
@@ -168,12 +155,9 @@ nnoremap <C-w>s <C-w>s<C-w>w
 nnoremap <C-w>v <C-w>v<C-w>w
 
 """ Search
-" Highlight search results
-set hlsearch
-" Ignore case when searching.
-set ignorecase
-" Don't ignore case when search has capital letter
-set smartcase
+set hlsearch " Highlight search results
+set ignorecase " Ignore case when searching.
+set smartcase " Don't ignore case when search has capital letter
 
 " Quicker window movement
 nnoremap <C-j> <C-w>j
@@ -182,15 +166,21 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
 """ SHORTCUTS """
-
-" Quickly open netrw
-map <leader>b :e.<CR>
+set pastetoggle=<leader>z  " toggle paste mode
 
 " in case you forgot to sudo
 cnoremap w!! %!sudo tee > /dev/null %
 
+" select last pasted text
+nnoremap gp `[v`]
+
 " Open help in a new tab
 cabbrev h tab h
+
+" Easy syntax switching
+nnoremap <leader>Tp :set ft=python<CR>
+nnoremap <leader>Tj :set ft=javascript<CR>
+nnoremap <leader>Tr :set ft=rst<CR>
 
 " Quickly edit vimrc
 nmap <leader>, :tabedit $MYVIMRC<CR>
@@ -220,7 +210,6 @@ noremap <leader>h ^
 noremap <leader>l $
 
 " Split line (sister to [J]oin lines)
-" The normal use of S is covered by cc, so don't worry about shadowing it.
 nnoremap S i<cr><esc>^mwgk:silent! s/\v +$//<cr>:noh<cr>`w
 
 " Move vertically over wrapped lines
@@ -228,15 +217,39 @@ nmap j gj
 nmap k gk
 
 "" Tabs
-nmap <Tab> gt
-nmap <S-Tab> gT
 nnoremap <silent> <S-t> :tabnew<CR>
 
 """ Syntax
 " fdoc is yaml
 autocmd BufRead,BufNewFile *.fdoc set filetype=yaml
-" md is markdown
-autocmd BufRead,BufNewFile *.md set filetype=markdown
 
-" For better commit messages
-autocmd Filetype gitcommit setlocal textwidth=72
+" rst
+autocmd BufNewFile,BufRead *.txt setlocal ft=rst
+autocmd FileType rst setlocal nolist expandtab lbr shiftwidth=4 tabstop=4 softtabstop=4
+\ formatoptions+=nqtl
+
+" markdown
+autocmd BufRead,BufNewFile *.md set filetype=markdown
+autocmd FileType markdown setlocal nolist expandtab lbr shiftwidth=4 tabstop=4 softtabstop=4
+\ formatoptions+=nqtl
+
+" yaml
+autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 softtabstop=2
+
+" vim
+autocmd FileType vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
+
+" commit messages
+autocmd Filetype gitcommit setlocal nolist textwidth=72
+
+" GUI settings, e.g. MacVim
+set guifont=Ubuntu\ Mono:h14
+if has('gui_running')
+    if has('mac')
+        set transparency=7
+        " Hide scrollbars in MacVim
+        set guioptions-=T
+        set guioptions-=r
+        set go-=L
+    endif
+endif

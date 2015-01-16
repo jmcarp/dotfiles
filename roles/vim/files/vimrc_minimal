@@ -1,17 +1,15 @@
-set nocompatible              " be iMproved, required for Vundle
+set nocompatible              " be iMproved
 
 " Spacebar is a much better leader than \ or ,
 let mapleader = "\<Space>"
 
 " Automatically source the vimrc file after saving it
-if has("autocmd")
-  autocmd bufwritepost .vimrc source $MYVIMRC
-endif
+autocmd bufwritepost .vimrc source $MYVIMRC
 
 """"" PLUGINS """""
 call plug#begin()
 Plug 'rking/ag.vim'
-Plug 'kien/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 " Go to symbol
 " Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
 if executable('ag')
@@ -19,10 +17,9 @@ if executable('ag')
   set grepprg=ag\ --nogroup\ --nocolor
   " Use ag in CtrlP for listing files.
   let g:ctrlp_user_command = 'ag %s -i -l --nocolor --nogroup --ignore ''.git'' --ignore ''.DS_Store'' --ignore ''.ropeproject'' --ignore ''node_modules'' --hidden -g ""'
-  " ag is fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching = 0
   nnoremap <leader>f :Ag<space>
 else
+  Plug 'mileszs/ack.vim'
   noremap <leader>f :Ack<space>
 endif
 map <leader>s :CtrlPBufTag<CR>
@@ -30,17 +27,27 @@ Plug 'ervandew/supertab'
 
 Plug 'scrooloose/nerdtree'
 nnoremap <leader>d :NERDTreeToggle<CR>
+nnoremap <leader>D :NERDTreeFind<CR>
 
-Plug 'chriskempson/vim-tomorrow-theme'
+" Colors
+Plug 'flazz/vim-colorschemes'
+
+" Buffers
+Plug 'ap/vim-buftabline'
+Plug 'moll/vim-bbye'
+nnoremap X :Bdelete<CR>
 
 Plug 'tpope/vim-commentary'
 " Toggle comment with space-/
 nmap <leader>/ gcc
 vmap <leader>/ gc
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
+
+" Sensible defaults
+Plug 'tpope/vim-sensible'
+Plug 'rstacruz/vim-opinion'
 
 " Load plugins
 call plug#end()            " required
@@ -48,18 +55,13 @@ filetype plugin indent on    " required
 
 """ end plugins """
 
-
 """ BASE CUSTOMIZATIONS """
 set encoding=utf-8
-syntax enable
 set autoindent
 set autoread " reload files when changed on disk, i.e. via `git checkout`
 set backupcopy=yes
 set clipboard=unnamed " Make "yanks" work with system clipboard
-set ignorecase " case-insensitive search
-set incsearch " search as you type
-set wildmenu " show a navigable menu for tab completion
-set wildmode=longest,list,full
+set wildmenu wildmode=longest,list,full
 
 " Indents
 set expandtab " expand tabs by default (overloadable per file type later)
@@ -68,37 +70,26 @@ set softtabstop=4 " when hitting <BS>, pretend like a tab is removed, even if sp
 set shiftwidth=4 " number of spaces to use for autoindenting
 set shiftround " use multiple of shiftwidth when indenting with '<' and '>'
 
-set nobackup
-set noswapfile  " Prevent annoying swapfile dialogs
 " No bells
-set noerrorbells
-set visualbell
-set t_vb=
+set noerrorbells visualbell t_vb=
 """ VISUAL SETTINGS """
 
 set t_Co=256 " Must be 256 for many themes to display correctly
-" May want to have different schemes for termvim vs gvim
-silent! colorscheme Tomorrow-Night
+silent! colorscheme hybrid
 
 " Show trailing whitespace
-set list
-set listchars=tab:▸\ ,trail:▫
+set list listchars=tab:▸\ ,trail:▫
 
-if &term =~ '256color'
-  set t_ut=
-endif
+" Check is necessary because breakindent isn't yet available on MacVim =(
+if exists('&breakindent') | set breakindent showbreak=.. | endif
+
+if &term =~ '256color' | set t_ut= | endif
 
 set cursorline  " have a line indicate cursor location
-set foldmethod=manual
 set previewheight=25  " Larger preview height
-set number " Show line numbers on the sidebar.
-" Do not fold by default.
-set nofoldenable
 
 " Set minimum window size to 79x5.
-set winwidth=79
-set winheight=5
-set winminheight=5
+set winwidth=79 winheight=5 winminheight=5
 
 " Patterns for expand(), ctrlp, etc. to ignore
 set wildignore+=log/**,node_modules/**,target/**,tmp/**,*.rbc/,.git/*,*/.hg/*,*/.svn/*
@@ -109,8 +100,7 @@ set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
 set wildignore+=*.swp,*~,._*
 set wildignore+=*.pyc
 " Enable basic mouse behavior such as resizing buffers.
-set mouse=a
-set mousemodel=popup " Right-click pops up a menu
+set mouse=a mousemodel=popup " Right-click pops up a menu
 if exists('$TMUX') " Support resizing in tmux
   set ttymouse=xterm2
 endif
@@ -123,9 +113,7 @@ if exists("+undofile")
   if isdirectory($HOME . '/.vim/undo') == 0
     :silent !mkdir -p ~/.vim/undo > /dev/null 2>&1
   endif
-  set undodir=./.vim-undo//
-  set undodir+=~/.vim/undo//
-  set undofile
+  set undodir=./.vim-undo// undodir+=~/.vim/undo// undofile
 endif
 
 " Make sure Vim returns to the same line when you reopen a file.
@@ -137,9 +125,6 @@ augroup line_return
         \     execute 'normal! g`"zvzz' |
         \ endif
 augroup END
-
-" Stop that stupid window from popping up
-map q: :q
 
 " Change cursor style when entering INSERT mode (works in tmux!)
 if exists('$TMUX')
@@ -154,102 +139,86 @@ endif
 nnoremap <C-w>s <C-w>s<C-w>w
 nnoremap <C-w>v <C-w>v<C-w>w
 
-""" Search
-set hlsearch " Highlight search results
-set ignorecase " Ignore case when searching.
-set smartcase " Don't ignore case when search has capital letter
-
+""" SHORTCUTS """
+" Smash escape
+inoremap jk <Esc>
+" Switch between files
+nnoremap <leader>b :e#<CR>
 " Quicker window movement
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
-
-""" SHORTCUTS """
+" Move across buffers with arrow keys
+nnoremap <silent> <Right> :bnext<CR>
+nnoremap <silent> <Left> :bprev<CR>
+" Remove trailing whitespace on <space><space>w
+nnoremap <leader><leader>w :%s/\s\+$//<cr>:let @/=''<CR>
 set pastetoggle=<leader>z  " toggle paste mode
-
 " in case you forgot to sudo
 cnoremap w!! %!sudo tee > /dev/null %
-
 " select last pasted text
 nnoremap gp `[v`]
-
-" Open help in a new tab
-cabbrev h tab h
-
 " Easy syntax switching
 nnoremap <leader>Tp :set ft=python<CR>
 nnoremap <leader>Tj :set ft=javascript<CR>
 nnoremap <leader>Tr :set ft=rst<CR>
-
 " Quickly edit vimrc
-nmap <leader>, :tabedit $MYVIMRC<CR>
-
+nmap <leader>, :e $MYVIMRC<CR>
 " Quickly write/quit/save-and-quit
 nnoremap <leader>w :w<CR>
 nnoremap <leader>q :q<CR>
 nnoremap <leader>Q :wq<CR>
-
+" Quickly open netrw
+nnoremap <leader>e :e.<CR>
 " Unhighlight search
 nnoremap <Leader>n :nohlsearch<CR><C-L>
-
 " Quick split
 nnoremap <Leader>v <C-w>v<C-w>w
-
 " Quick copy whole file
 map <leader>a :%y+<CR>
-
 " Make D delete to end of line
 nnoremap D d$
-
 " Make Y yank to end of line
 nnoremap Y y$
-
 " Go to beginning/end of line
 noremap <leader>h ^
 noremap <leader>l $
-
-" Split line (sister to [J]oin lines)
-nnoremap S i<cr><esc>^mwgk:silent! s/\v +$//<cr>:noh<cr>`w
-
+" Execute macro
+nnoremap Q @q
 " Move vertically over wrapped lines
 nmap j gj
 nmap k gk
-
 "" Tabs
-nnoremap <silent> <S-t> :tabnew<CR>
+nnoremap <silent> tt :tabnew<CR>
 
-""" Syntax
-" fdoc is yaml
-autocmd BufRead,BufNewFile *.fdoc set filetype=yaml
-
-" rst
-autocmd BufNewFile,BufRead *.txt setlocal ft=rst
-autocmd FileType rst setlocal nolist expandtab lbr shiftwidth=4 tabstop=4 softtabstop=4
-\ formatoptions+=nqtl
-
-" markdown
-autocmd BufRead,BufNewFile *.md set filetype=markdown
-autocmd FileType markdown setlocal nolist expandtab lbr shiftwidth=4 tabstop=4 softtabstop=4
-\ formatoptions+=nqtl
-
-" yaml
-autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 softtabstop=2
-
-" vim
-autocmd FileType vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
-
-" commit messages
-autocmd Filetype gitcommit setlocal nolist textwidth=72
+""" Languages
+augroup configgroup
+  autocmd!
+  " rst
+  autocmd BufNewFile,BufRead *.txt setlocal ft=rst
+  autocmd FileType rst setlocal wrap nolist expandtab lbr shiftwidth=4 tabstop=4 softtabstop=4
+  \ formatoptions+=nqtl
+  " markdown
+  autocmd BufRead,BufNewFile *.md set filetype=markdown
+  autocmd FileType markdown setlocal wrap nolist expandtab lbr shiftwidth=4 tabstop=4 softtabstop=4
+  \ formatoptions+=nqtl
+  " yaml
+  autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 softtabstop=2
+  " vim
+  autocmd FileType vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
+  " javascript
+  autocmd FileType javascript setlocal shiftwidth=4 tabstop=4 softtabstop=4
+  " commit messages
+  autocmd Filetype gitcommit setlocal nolist textwidth=72
+augroup END
 
 " GUI settings, e.g. MacVim
 set guifont=Ubuntu\ Mono:h14
 if has('gui_running')
     if has('mac')
-        set transparency=7
+        set transparency=5
         " Hide scrollbars in MacVim
-        set guioptions-=T
-        set guioptions-=r
-        set go-=L
+        set guioptions-=Tr guioptions-=r go-=L
     endif
 endif

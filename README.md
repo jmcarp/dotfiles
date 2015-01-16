@@ -8,7 +8,7 @@ a few neat features
 
 - zsh configured with [prezto](https://github.com/sorin-ionescu/prezto).
 - nice fonts for the terminal and coding.
-- iterm2 themes.
+- iterm2 profile (w/ hotkey, themes, etc.)
 - anaconda python (Miniconda 3 distribution).
 - a tmux.conf that's pretty neat.
 - vim with [vim-plug](https://github.com/junegunn/vim-plug) for plugin management. All configuration in a single file [.vimrc](https://github.com/sloria/dotfiles/blob/master/roles/vim/files/vimrc).
@@ -38,7 +38,8 @@ $ cd ~/dotfiles
 ```
 
 - Update the following variables in `group_vars/local` (at a minimum)
-    - `git_user`: Your git user name.
+    - `full_name`: Your name, which will be attached to commit messages, e.g. "Steven Loria"
+    - `git_user`: Your Github username.
     - `git_email`: Your git email address.
 - Optional, but recommended: Update `group_vars/local` with the programs you want installed by [homebrew][], [homebrew-cask][], and npm.
     - `osx_homebrew_packages`:  Utilities that don't get installed by the roles.
@@ -88,12 +89,11 @@ To install fonts on OSX, simply drag the `.ttf` files in `misc/fonts` directory 
 
 The `python` topic installs the [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda/) using the [miniconda](http://conda.pydata.org/miniconda.html) installer. The installation is entirely self-contained, and lives at `~/miniconda`.
 
-**iterm2 color themes**
+**iterm2**
 
-256 color-mode should be enabled for themes to appear correctly. In the iterm2 preferences window, go to your default profile settings and click the "Terminal". Change the "Report Terminal Type" to "xterm-256color".
+To import the iterm2 profile, go to your iterm2 preferences, and enable "Load preferences from custom folder" and select the iterm2 folder in the `misc/` directory.
 
-To import an iterm theme from the `misc/iterm-themes` directory, open your iTerm2 preferences and go to your Profiles settings. In the color tab, click the Load preset dropdown and choose "Import".
-
+![iterm2 profile](https://dl.dropboxusercontent.com/u/1693233/github/dotfiles-iterm2.png)
 
 **macosx keyboard settings**
 
@@ -129,6 +129,7 @@ $ cp remotehosts.example remotehosts
 Update the following variables in `group_vars/remote`:
 
 - `dotfiles_user_home` : Your user home directory.
+- `full_name`: Full name, for use in commit messages.
 - `git_user` : Your git user name.
 - `git_email` : Your git email.
 
@@ -142,6 +143,8 @@ what if I only want your vim?
 -----------------------------
 
 The following commands will install vim-plug and download my `.vimrc`.
+
+After backing up your `~/.vim` directory and `~/.vimrc`:
 
 ```
 mkdir -p ~/.vim/autoload

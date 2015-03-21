@@ -334,7 +334,7 @@ augroup configgroup
   " vim
   autocmd FileType vim setlocal shiftwidth=2 tabstop=2 softtabstop=2
   " javascript
-  autocmd FileType javascript setlocal shiftwidth=4 tabstop=4 softtabstop=4
+  autocmd FileType javascript setlocal shiftwidth=2 tabstop=2 softtabstop=2
   " commit messages
   autocmd Filetype gitcommit setlocal nolist textwidth=72
 augroup END
